@@ -5,6 +5,7 @@ let guessesRemaining = NUMBER_OF_GUESSES;
 let currentGuess = [];
 let nextLetter = 0;
 let rightGuessString = WORDS[Math.floor(Math.random() * WORDS.length)]
+
 console.log(rightGuessString)
 
 function initBoard() {
@@ -40,20 +41,6 @@ function shadeKeyBoard(letter, color) {
             break
         }
     }
-}
-
-function insertLetter (pressedKey) {
-    if (nextLetter === 5) {
-        return
-    }
-    pressedKey = pressedKey.toLowerCase()
-
-    let row = document.getElementsByClassName("letter-row")[6 - guessesRemaining]
-    let box = row.children[nextLetter]
-    box.textContent = pressedKey
-    box.classList.add("filled-box")
-    currentGuess.push(pressedKey)
-    nextLetter += 1
 }
 
 function deleteLetter () {
@@ -111,6 +98,8 @@ function checkGuess () {
 
         let delay = 250 * i
         setTimeout(()=> {
+            //flip box
+            animateCSS(box, 'flipInX')
             //shade box
             box.style.backgroundColor = letterColor
             shadeKeyBoard(letter, letterColor)
@@ -132,6 +121,41 @@ function checkGuess () {
         }
     }
 }
+
+function insertLetter (pressedKey) {
+    if (nextLetter === 5) {
+        return
+    }
+    pressedKey = pressedKey.toLowerCase()
+
+    let row = document.getElementsByClassName("letter-row")[6 - guessesRemaining]
+    let box = row.children[nextLetter]
+    animateCSS(box, "pulse")
+    box.textContent = pressedKey
+    box.classList.add("filled-box")
+    currentGuess.push(pressedKey)
+    nextLetter += 1
+}
+
+const animateCSS = (element, animation, prefix = 'animate__') =>
+  // We create a Promise and return it
+  new Promise((resolve, reject) => {
+    const animationName = `${prefix}${animation}`;
+    // const node = document.querySelector(element);
+    const node = element
+    node.style.setProperty('--animate-duration', '0.3s');
+    
+    node.classList.add(`${prefix}animated`, animationName);
+
+    // When the animation ends, we clean the classes and resolve the Promise
+    function handleAnimationEnd(event) {
+      event.stopPropagation();
+      node.classList.remove(`${prefix}animated`, animationName);
+      resolve('Animation ended');
+    }
+
+    node.addEventListener('animationend', handleAnimationEnd, {once: true});
+});
 
 document.addEventListener("keyup", (e) => {
 
@@ -173,4 +197,4 @@ document.getElementById("keyboard-cont").addEventListener("click", (e) => {
     document.dispatchEvent(new KeyboardEvent("keyup", {'key': key}))
 })
 
-initBoard()
+initBoard();
